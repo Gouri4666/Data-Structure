@@ -1,0 +1,270 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct node
+{
+	int data;
+	struct node *prev;
+	struct node *next;
+};
+struct node *start=NULL,*tail=NULL,*newnode,*ptr,*temp;
+
+void insert_beg();
+void insert_pos();
+void insert_end();
+void del_beg();
+void del_pos();
+void del_end();
+void forward();
+void backward();
+void createnew();
+int count();
+int main()
+{
+	int i,n,ch,cont;
+	printf("Enter number of initial node:");
+	scanf("%d",&n);
+	for(i=0;i<n;i++)
+	{
+		printf("Enter Element %d: ",i+1);
+		newnode=(struct node *)malloc(sizeof(struct node));
+		 scanf("%d",&newnode->data);
+		newnode->prev=NULL;
+		newnode->next=NULL;
+		if(start==NULL)
+		{
+			start=newnode;
+			ptr=start;
+			tail=newnode;
+		}
+		else
+		{
+			ptr->next=newnode;
+			newnode->prev=ptr;
+			ptr=ptr->next;
+			tail=ptr;
+		}
+	}
+	do
+	{
+		printf("\n\tMENU\n\t1.INSERTION AT BEGINNING\n\t2.INSERTION AT POSITION\n\t3.INSERTION AT END\n\t4.DELETE FROM BEGINNING\n\t5.DELETE FROM POSITION\n\t6.DELETE FROM END\n\t7.DISPLAY FORWARD\n\t8.DISPLAY BACKWARD\n\t9.COUNT ELEMENTS\n\t10.EXIT\n");
+	printf("Enter choice:");
+	scanf("%d",&ch);
+	switch(ch)
+	{
+		case 1:insert_beg();
+			break;
+		case 2:insert_pos();
+			break;
+		case 3:insert_end();
+			break;
+		case 4:del_beg();
+			break;
+		case 5:del_pos();
+			break;
+		case 6:del_end();
+			break;
+		case 7:forward();
+			break;
+		case 8:backward();
+			break;
+		case 9:printf("Total number of elements: %d",count());
+			break;
+		case 10:printf("Exiting...");
+			return 0;
+		default:printf("Invalid Choice!");
+	}
+	printf("\nContinue or Exit (1/0): ");
+	scanf("%d",&cont);
+	}
+	while(cont==1);
+return 0;
+}
+
+void insert_beg()
+{
+	createnew();
+	if(start==NULL)
+	{
+		start=newnode;
+		tail=newnode;
+	}
+	else
+	{
+		newnode->next=start;
+		start->prev=newnode;
+		start=newnode;
+	}
+	printf("Element inserted at beginning");
+}
+
+void insert_pos()
+{
+	int pos,i;
+	int c=count();
+	if(start!=NULL)
+	{
+		printf("Enter position: ");
+		scanf("%d",&pos);
+		if(pos<1 || pos>c+1)
+		printf("insertion not possible");
+		else
+		{
+			createnew();
+			ptr=start;
+			temp=start;
+			for(i=1;i<pos-1;i++)
+			ptr=ptr->next;
+			for(i=1;i<pos;i++)
+			temp=temp->next;
+			newnode->next=temp;
+			temp->prev=newnode;
+			ptr->next=newnode;
+			newnode->prev=ptr;
+			printf("Item inserted");
+		}
+	}
+	else
+	printf("Insertion not possible");
+}
+
+void insert_end()
+{
+	if(start==NULL)
+	printf("insertion not possible");
+	else
+	{
+		createnew();
+		tail->next=newnode;
+		newnode->prev=tail;
+		tail=newnode;
+		printf("Item inserted at end");
+	}
+}
+
+void del_beg()
+{
+	int item;
+	if(start==NULL)
+	printf("Deletion not possilble");
+	else
+	{
+		item=start->data;
+		ptr=start;
+		start=start->next;
+		if(start==NULL)
+		tail=NULL;
+		else
+		start->prev=NULL;
+		free(ptr);
+		printf("%d deleted",item);
+	}
+}
+
+void del_pos()
+{
+	int pos,i,item;
+	int c=count();
+	printf("Enter position: ");
+	scanf("%d",&pos);
+	if(start==NULL)
+	printf("Deletion not possible");
+	else
+	{
+		if(pos<1 || pos>c)
+		printf("Deletion not possible");
+		else
+		{	
+			if(pos==1)
+			del_beg();
+			else if(pos==c)
+			del_end();
+			else
+			{
+				ptr=start;
+				temp=start;
+				for(i=1;i<pos-1;i++)
+				ptr=ptr->next;
+				for(i=1;i<pos+1;i++)
+				temp=temp->next;
+				item=ptr->next->data;
+				ptr->next=temp;
+				temp->prev=ptr;
+				printf("%d deleted",item);
+			}
+		}
+	}
+}
+
+void del_end()
+{
+	int item;
+	if(tail==NULL)
+	printf("Deletion Not possible");
+	else
+	{
+		ptr=tail;
+		item=ptr->data;
+		tail=tail->prev;
+		if(tail==NULL)
+		start=NULL;
+		else
+		tail->next=NULL;
+		ptr->prev=NULL;
+		free(ptr);
+		printf("%d deleted",item);
+	}
+}
+
+void forward()
+{
+	if(start==NULL)
+	printf("Empty");
+	else
+	{
+	ptr=start;
+	printf("Linked list elements :");
+	while(ptr!=NULL)
+	{
+		printf("%d ",ptr->data);
+		ptr=ptr->next;
+	}
+	}
+}
+
+void backward()
+{
+	if(tail==NULL)
+	printf("Empty");
+	else
+	{
+	ptr=tail;
+	printf("Elements in reverse order:");
+	while(ptr!=NULL)
+	{
+		printf("%d ",ptr->data);
+		ptr=ptr->prev;
+	}
+	}
+}
+
+void createnew()
+{
+	printf("Enter item to insert: ");
+	newnode=(struct node *)malloc(sizeof(struct node));
+	scanf("%d",&newnode->data);
+	newnode->prev=NULL;
+	newnode->next=NULL;
+
+}
+
+int count()
+{
+	int c=0;
+	ptr=start;
+	while(ptr!=NULL)
+	{
+		c++;
+		ptr=ptr->next;
+	}
+	return c;
+}
