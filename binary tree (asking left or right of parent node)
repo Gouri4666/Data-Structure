@@ -1,0 +1,240 @@
+//binary tree
+#include<stdio.h>
+#include<stdlib.h>
+struct node
+{
+	int data;
+	struct node *left;
+	struct node *right;
+};
+struct node *root=NULL;
+struct queue
+{
+	struct node *data[100];
+	int front,rear;
+};
+void insertion();
+void deletion();
+void inorder();
+void preorder();
+void postorder();
+void inorderTraversal(struct node *node);
+void preorderTraversal(struct node *node);
+void postorderTraversal(struct node *node);
+//main program
+int main()
+{
+	int cont,ch;
+	do
+	{
+		printf("\n\tMENU\n\t1.Insertion\n\t2.Deletion\n\t3.Inorder\n\t4.Preorder\n\t5.Postorder\n");
+		printf("Ente chioce: ");
+		scanf("%d",&ch);
+		switch(ch)
+		{	
+			case 1:insertion();
+				break;
+			case 2:deletion();
+				break;
+			case 3:inorder();
+				break;
+			case 4:preorder();
+				break;
+			case 5:postorder();
+				break;
+			default:printf("Invalid choice");
+		}
+		printf("\nconinue or exit(1/0): ");
+		scanf("%d",&cont);
+	}
+	while(cont==1);
+	return 0;
+}
+
+void insertion()
+{
+	int parent,found=0,direction;
+	struct node *temp,*newnode;
+	printf("Enter item to insert:");
+	newnode=(struct node *)malloc(sizeof(struct node));
+	scanf("%d",&newnode->data);
+	newnode->left = NULL;
+    newnode->right = NULL;
+	if(root==NULL)
+	{
+		root=newnode;
+		printf("%d inserted as root node",root->data);
+		return;
+	}
+	printf("Enter parent value: ");
+	scanf("%d",&parent);
+	struct node *queue[100];
+	int front=0,rear=0;
+	queue[rear]=root;
+	while(front<=rear)
+	{
+		temp=queue[front++];
+		if(temp->data==parent)
+		{
+			found=1;
+			printf("Where to insert\n\t1.Left\n\t2.Right\nEnter choice: ");
+			scanf("%d",&direction);
+			if(direction==1)
+			{
+				if(temp->left==NULL)
+				{
+					temp->left=newnode;
+					printf("%d inserted to left of %d",newnode->data,temp->data);
+				}
+				else
+				{
+					printf("Left node of %d is occupied",temp->data);
+					free(newnode);
+				}
+			}
+			else if(direction==2)
+			{
+				if(temp->right==NULL)
+				{
+					temp->right=newnode;
+					printf("%d inserted to right of %d",newnode->data,temp->data);
+				}
+				else
+				{
+					printf("Right node of %d is occupied",temp->data);
+					free(newnode);
+					
+				}
+			}
+			else
+			{
+				printf("Invalid choice!Insertion failed");
+				free(newnode);
+			}
+			return;
+		}
+		if(temp->left)
+			queue[++rear]=temp->left;
+		if(temp->right)
+			queue[++rear]=temp->right;
+	}
+	if(!found)
+		{
+		printf("Parent node doesn't exist");
+		free(newnode);
+		}
+	
+}
+void deletion()
+{
+	if(root==NULL)
+	{
+		printf("Tree is empty, deletion not possible");
+		return;
+	}
+	int key;
+	printf("Enter value to delete:");
+	scanf("%d",&key);
+	int found=0;
+	while(1)
+	{
+		struct node *queue[100];
+		int front=0,rear=0;
+		queue[rear]=root;
+		struct node *temp,*parentNode,*keyNode=NULL,*lastNode;
+		while(front<=rear)
+		{
+			temp=queue[front++];
+			if(temp->data==key && keyNode==NULL)
+			keyNode=temp;
+			if(temp->left)
+			{
+				parentNode=temp;
+				queue[++rear]=temp->left;
+			}			
+			if(temp->right)
+			{
+				parentNode=temp;
+				queue[++rear]=temp->right;
+			}
+			lastNode=temp;
+		}
+		if(keyNode==NULL)
+		break;
+		//replace
+		keyNode->data=lastNode->data;
+		//delete
+		if(parentNode!=NULL)
+		{
+			if(parentNode->right==lastNode)
+			parentNode->right=NULL;
+			if(parentNode->left==lastNode)
+			parentNode->left=NULL;
+		}
+		else
+		root==NULL;
+		free(lastNode);
+		found=1;
+	}
+	if(found)
+	printf("%d deleted",key);
+	else
+	printf("Item not found");
+
+}
+void inorder()
+{
+	if(root==NULL)
+	{
+	printf("Empty");
+	return;
+	}
+	printf("traversal: ");
+	inorderTraversal(root);
+}
+void preorder()
+{
+	if(root==NULL)
+	{
+	printf("Empty");
+	return;
+	}
+	printf("traversal: ");
+	preorderTraversal(root);
+}
+void postorder()
+{
+	if(root==NULL)
+	{
+	printf("Empty");
+	return;
+	}
+	printf("traversal: ");
+	postorderTraversal(root);
+}
+void inorderTraversal(struct node *node)
+{
+	if(node==NULL)
+	return;
+	inorderTraversal(node->left);
+	printf("%d ",node->data);
+	inorderTraversal(node->right);
+}
+void preorderTraversal(struct node *node)
+{
+	if(node==NULL)
+	return;
+	printf("%d ",node->data);
+	preorderTraversal(node->left);
+	preorderTraversal(node->right);
+
+}
+void postorderTraversal(struct node *node)
+{
+	if(node==NULL)
+	return;
+	postorderTraversal(node->left);
+	postorderTraversal(node->right);
+	printf("%d ",node->data);
+
+}
