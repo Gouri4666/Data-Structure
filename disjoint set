@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+int parent[MAX]; // stores parent/root of each element
+
+// Check if element exists in a set array
+int isDuplicate(int element, int set[], int n) {
+    for (int i = 0; i < n; i++)
+        if (set[i] == element)
+            return 1;
+    return 0;
+}
+
+// Create set with first element as root
+void createSet(int set[], int n) {
+    int root = set[0];  // first element is root
+    for (int i = 0; i < n; i++)
+        parent[set[i]] = root;
+}
+
+// Find root of an element
+int find(int x) {
+    return parent[x];
+}
+
+// Union operation: element x from Set 1, element y from Set 2
+// Returns 1 if union is performed, 0 otherwise
+int unionSet(int set1[], int n1, int set2[], int n2, int x, int y) {
+    int rootX = find(x);
+    int rootY = find(y);
+
+    if (rootX == rootY) {
+        printf("Union not possible: elements %d and %d belong to the same set.\n", x, y);
+        return 0;
+    }
+
+    // Make all elements of set containing y point to rootX
+    for (int i = 0; i < n2; i++)
+        parent[set2[i]] = rootX;
+
+    printf("Union done. Root of merged set is %d.\n", rootX);
+    return 1;
+}
+
+// Display a set with its root mapping
+void displaySet(char *setName, int set[], int n) {
+    printf("%s Elements -> Root mapping:\n", setName);
+    for (int i = 0; i < n; i++)
+        printf("%d -> %d\n", set[i], find(set[i]));
+    printf("\n");
+}
+
+// Display merged set as a single list
+void displayMergedSetSingle(int set1[], int n1, int set2[], int n2) {
+    printf("Merged Set Elements -> Root mapping:\n");
+    for (int i = 0; i < n1; i++)
+        printf("%d -> %d\n", set1[i], find(set1[i]));
+    for (int i = 0; i < n2; i++)
+        printf("%d -> %d\n", set2[i], find(set2[i]));
+    printf("\n");
+}
+
+int main() {
+    int set1[MAX], set2[MAX];
+    int n1, n2;
+    int unionPerformed = 0; // flag to track if union has happened
+
+    // Input Set 1
+    printf("Enter number of elements in Set 1: ");
+    scanf("%d", &n1);
+    printf("Enter elements of Set 1 (distinct): ");
+    for (int i = 0; i < n1; i++)
+        scanf("%d", &set1[i]);
+
+    // Input Set 2
+    printf("Enter number of elements in Set 2: ");
+    scanf("%d", &n2);
+    printf("Enter elements of Set 2 (distinct, not in Set 1): ");
+    for (int i = 0; i < n2; i++) {
+        scanf("%d", &set2[i]);
+        while (isDuplicate(set2[i], set1, n1)) {
+            printf("Element %d already exists in Set 1. Enter a different element: ", set2[i]);
+            scanf("%d", &set2[i]);
+        }
+    }
+
+    // Create sets
+    createSet(set1, n1);
+    createSet(set2, n2);
+
+    // Display sets immediately after creation separately
+    printf("\nInitial Sets:\n");
+    displaySet("Set 1", set1, n1);
+    displaySet("Set 2", set2, n2);
+
+    int choice, cont;
+    do {
+        printf("\n--- Set Operations Menu ---\n");
+        printf("1. Union\n2. Find\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: {
+                int x, y;
+                printf("Enter an element from Set 1: ");
+                scanf("%d", &x);
+                printf("Enter an element from Set 2: ");
+                scanf("%d", &y);
+                int merged = unionSet(set1, n1, set2, n2, x, y);
+                if (merged) {
+                    unionPerformed = 1; // mark that union has occurred
+                    // Display as single merged set
+                    displayMergedSetSingle(set1, n1, set2, n2);
+                }
+                break;
+            }
+
+            case 2: {
+                int x;
+                printf("Enter element to find: ");
+                scanf("%d", &x);
+                printf("Element %d belongs to set with root %d\n", x, find(x));
+                break;
+            }
+
+            default:
+                printf("Invalid choice!\n");
+        }
+
+        printf("Do you want to continue? (1-Yes, 0-No): ");
+        scanf("%d", &cont);
+
+    } while (cont == 1);
+
+    printf("\nFinal Sets:\n");
+    if (unionPerformed) {
+        displayMergedSetSingle(set1, n1, set2, n2); // merged set
+    } else {
+        displaySet("Set 1", set1, n1);
+        displaySet("Set 2", set2, n2);
+    }
+
+    return 0;
+}
